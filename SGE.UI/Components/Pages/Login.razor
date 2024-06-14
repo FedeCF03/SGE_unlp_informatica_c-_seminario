@@ -1,0 +1,64 @@
+@page "/login"
+@using Microsoft.AspNetCore.Http.Extensions
+@using SGE.Aplicacion
+@using SGE.Aplicacion.Servicios
+@using SGE.Repositorios
+@using System.Security.Cryptography;
+@using System.Text
+
+@namespace SGE.Aplicacion.CasosDeUso
+@rendermode InteractiveServer
+@inject IUsuarioRepositorio UsuarioSqlite
+<PageTitle>Login</PageTitle>
+<h3>Login</h3>
+@inject NavigationManager Navigation
+
+<EditForm Model="@user">
+    <div class="form-group">
+        <label for="usuario">Usuario:</label>
+        <InputText id="usuario" @bind-Value="user.Nombre" class="form-control" />
+        <label for="contraseña">Contraseña:</label>
+        <InputText id="contraseña" @bind-Value="user.Contraseña" class="form-control" />
+    </div>
+    <button type="submit" @onclick="Loggear" class="btn btn-primary">Iniciar sesión</button>
+</EditForm>
+<div>
+    <span>Si no tiene un usuario hecho, presione en el siguiente botón para crear uno</span>
+    <button type="button" @onclick="redirect" class="btn btn-primary">Registrarse</button>
+</div>
+@if (Loggeado)
+{
+    <div class="alert alert-danger" role="alert">
+        Usuario o contraseña incorrectos
+    </div>
+}
+@code
+{
+    Usuario user = new Usuario();
+    bool Loggeado = false;
+    private void redirect()
+    {
+        Navigation.NavigateTo("/register/2");
+    }
+
+    private void Loggear()
+
+    {
+        try
+        {
+            ManejarLogin manejoLogin = new ManejarLogin(new UsuarioSqlite());
+            user = manejoLogin.Logear(user.Nombre, user.Contraseña);
+            string hash = Encoding.UTF8.GetString(SHA256.HashData(Encoding.UTF8.GetBytes(user.Id.ToString())));
+            if (user.Id == 1)
+                Navigation.NavigateTo($"/admin/");
+            else
+                Navigation.NavigateTo($"/home/{hash}");
+        }
+        catch
+        {
+            Loggeado = true;
+        }
+
+    }
+
+}

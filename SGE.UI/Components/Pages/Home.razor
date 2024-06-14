@@ -1,0 +1,61 @@
+﻿@page "/{id_parameter:string}"
+
+@attribute [StreamRendering]
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+using System.Security.Cryptography;
+@using static SGE.UI.Components.Pages.Home
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using SGE.Aplicacion
+@using SGE.Repositorios
+@using SGE.UI.Components
+@inject CasoDeUsoObtenerUsuario casoDeUsuarioObtener
+@inject IServicioAutorizacion servicioAutorizacion
+@using SGE.Aplicacion.CasosDeUso
+@rendermode InteractiveServer
+<div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="documentos" Match="NavLinkMatch.All">
+            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Listar documentos
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="agregar_expediente">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Agregar Expediente
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href=" ">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Agregar Tramite
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="agregar_usuario">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Agregar Usuario
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="listar_usuarios">
+            <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Listar Usuarios
+        </NavLink>
+    </div>
+    <menu>
+        @if (servicioAutorizacion.PoseeElPermiso(id_parameter, Permiso.ExpedienteAlta))
+        {
+            <li><a href="/expediente/alta">Alta de expediente</a></li>
+        }
+    </menu>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int id_parameter { get; set; }
+    bool Loggeado = false;
+    public Usuario obtenerUsuario()
+    {
+        return casoDeUsuarioObtener.Ejecutar(id_parameter);
+    }
+
+}
